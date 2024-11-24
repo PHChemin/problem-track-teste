@@ -1,8 +1,10 @@
 <?php
 
-define('DB_PATH', '/var/www/database/problems.txt');
+require '/var/www/core/errors/handler.php';
 
-$problems = file(DB_PATH, FILE_IGNORE_NEW_LINES);
+require '/var/www/app/models/Problem.php';
+
+$problems = Problem::all();
 
 $title = 'Problemas Registrados';
 $view = '/var/www/app/views/problems/index.phtml';
