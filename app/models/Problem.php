@@ -22,16 +22,47 @@ class Problem {
         return $this->id;
     }
 
-    public function setTitle(string $title) {
+    public function setTitle(string $title) 
+    {
         $this->title = $title;
     }
 
-    public function getTitle(): string {
+    public function getTitle(): string 
+    {
         return $this->title;
     }
 
-    public function save() {
-        file_put_contents(self::DB_PATH, $this->title . PHP_EOL, FILE_APPEND);
+    public function save(): bool 
+    {
+        if ($this->isValid()){
+            $this->id = count(file(self::DB_PATH)); 
+            file_put_contents(self::DB_PATH, $this->title . PHP_EOL, FILE_APPEND);
         return true;
+        }
+        return false;
+    }
+
+    public function isValid(): bool 
+    {
+        $this->errors = [];
+
+        if (empty($this->title))
+            $this->errors['title'] = 'O campo não pode estar vazio';
+
+
+        return empty($this->errors);
+    }
+
+    public function hasErrors() : bool 
+    {
+        return empty($this->errors);
+    }
+
+    public function errors($index) 
+    {
+        if(isset($this->errors[$index]))
+            return $this->errors[$index];
+
+        return null;
     }
 }
