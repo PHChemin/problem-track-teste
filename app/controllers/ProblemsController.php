@@ -10,7 +10,11 @@ class ProblemsController
         $problems = Problem::all();
 
         $title = 'Problemas Registrados';
-        $this->render('index', compact('problems', 'title'));
+
+        if ($this->isJsonRequest())
+            $this->renderJson('index', compact('problems', 'title'));
+        else
+            $this->render('index', compact('problems', 'title'));
     }
 
     public function show()
@@ -45,12 +49,6 @@ class ProblemsController
             $title = 'Novo Problema';
             $this->render('new', compact('problem', 'title'));
         }
-    }
-    
-    private function redirectTo($location)
-    {
-        header('Location: ' . $location);
-        exit;
     }
 
     public function edit()
@@ -100,5 +98,27 @@ class ProblemsController
         require '/var/www/app/views/layouts/' . $this->layout .  '.phtml';
     }
 
-    
+    private function redirectTo($location)
+    {
+        header('Location: ' . $location);
+        exit;
+    }
+
+    private function renderJson($view, $data = [])
+    {
+        extract($data);
+
+        $view = '/var/www/app/views/problems/' . $view . '.json.php';
+        $json = [];
+
+        header('Content-Type: application/json; chartset=utf-8');
+        require $view;
+        echo json_encode($json);
+        return;
+    }
+
+    private function isJsonRequest()
+    {
+        return (isset($_SERVER['HTTP_ACCEPT']) && $_SERVER['HTTP_ACCEPT'] === 'application/json');
+    }
 }
