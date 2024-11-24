@@ -58,11 +58,31 @@ class Problem {
         return empty($this->errors);
     }
 
-    public function errors($index) 
+    public function errors($index): string|null
     {
         if(isset($this->errors[$index]))
             return $this->errors[$index];
 
+        return null;
+    }
+
+    public static function all() : array
+    {
+        $problems = file(self::DB_PATH, FILE_IGNORE_NEW_LINES);
+
+        return array_map(function($line, $title){
+            return new Problem(id: $line, title: $title);
+        }, array_keys($problems), $problems);
+    }
+
+    public static function findById(int $id) : Problem|null
+    {
+        $problems = self::all();
+
+        foreach ($problems as $problem) {
+            if ($problem->getId() === $id)
+                return $problem;
+        }
         return null;
     }
 }
