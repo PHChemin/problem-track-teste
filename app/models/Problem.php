@@ -35,8 +35,17 @@ class Problem {
     public function save(): bool 
     {
         if ($this->isValid()){
-            $this->id = count(file(self::DB_PATH)); 
-            file_put_contents(self::DB_PATH, $this->title . PHP_EOL, FILE_APPEND);
+            if($this->newRecord()) {
+                $this->id = count(file(self::DB_PATH)); 
+                file_put_contents(self::DB_PATH, $this->title . PHP_EOL, FILE_APPEND);
+            }  else {
+                $problems = file(self::DB_PATH, FILE_IGNORE_NEW_LINES);
+                $problems[$this->id] = $this->title;
+
+                $data = implode(PHP_EOL, $problems);
+                file_put_contents(self::DB_PATH, $data . PHP_EOL);
+            }
+            
         return true;
         }
         return false;
@@ -51,6 +60,11 @@ class Problem {
 
 
         return empty($this->errors);
+    }
+
+    public function newRecord(): bool 
+    {
+        return $this->id === -1;
     }
 
     public function hasErrors() : bool 
